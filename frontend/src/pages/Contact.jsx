@@ -1,20 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MapPin, Phone, Mail, Youtube, Facebook, Twitter, Instagram, Clock, } from "lucide-react";
+import axios from "axios";
+import { successfullyToast, warningToast } from "../lib/toast";
 const Contact = () => {
 
   // Send Us a Message
 
+   useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
+  
+
   const [sendMsg, setSendMsg] = useState({
     firstName: "", lastName: "", email: "", phoneNo: "", msg: ""
   })
+  const [sendMsgLoading, setSendMsgLoading] = useState(false)
 
   const onChangeMsg = (e) => {
     let { name, value } = e.target
-    sendMsg[name] = value
+    setSendMsg({ ...sendMsg, [name]: value })
   }
 
-  const onSubmitMsg = (e) => {
-    console.log(sendMsg)
+  const onSubmitMsg = async (e) => {
+    try {
+      console.log(sendMsg)
+      setSendMsgLoading(true)
+
+      // Simulate API call
+
+      await axios.post("http://localhost:5000/api/contact",sendMsg)
+      successfullyToast("Mail", "Message sent successfully");
+
+
+      setSendMsg({
+        firstName: "", lastName: "", email: "", phoneNo: "", msg: ""
+      })
+      setSendMsgLoading(false)
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setSendMsgLoading(false);
+      warningToast("Mail", "Failed to send message");
+    }
   }
 
   return (
@@ -35,13 +61,13 @@ const Contact = () => {
           <div className="pb-4 md:pb-6 lg:mb-10">
             <h1 className="font-semibold text-2xl pb-4">Our Studio</h1>
             <h1 className="flex gap-2 items-center mb-4">
-              <MapPin color="#FA8C38" /> 123 Fitness Ave, Suite 400, Metropolis, MA 01234
+              <MapPin color="#FA8C38" /> Chromepet, Chennai, Tamil Nadu 600044
             </h1>
             <h1 className="flex gap-2 items-center mb-4">
-              <Phone color="#FA8C38" /> (555) 123-4567
+              <Phone color="#FA8C38" /> 9176017127
             </h1>
             <h1 className="flex gap-2 items-center mb-4">
-              <Mail color="#FA8C38" /> info@apexathletics.com
+              <Mail color="#FA8C38" /> rhvishnushankar@gamil.com
             </h1>
 
             <h1 className="flex gap-2 items-start mb-4">
@@ -83,30 +109,30 @@ const Contact = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <div className="flex flex-col gap-2 mb-3 lg:mb-4">
                 <label htmlFor="FirstName" className="text-gray-300 text-sm">First Name</label>
-                <input onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="text" id="FirstName" name="firstName" placeholder="Vishnu" />
+                <input value={sendMsg.firstName} onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="text" id="FirstName" name="firstName" placeholder="Vishnu" />
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="LastName" className="text-gray-300 text-sm">Last Name</label>
-                <input onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="text" id="LastName" name="lastName" placeholder="Shankar" />
+                <input value={sendMsg.lastName} onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="text" id="LastName" name="lastName" placeholder="Shankar" />
               </div>
             </div>
 
             <div className="flex flex-col gap-2 mb-3 lg:mb-4">
               <label htmlFor="email" className="text-gray-300 text-sm">Email Address</label>
-              <input onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="email" id="email" name="email" placeholder="vishnushankar@gmail.com" />
+              <input value={sendMsg.email} onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="email" id="email" name="email" placeholder="vishnushankar@gmail.com" />
             </div>
 
             <div className="flex flex-col gap-2 mb-3 lg:mb-4">
               <label htmlFor="phoneNo" className="text-gray-300 text-sm">Phone Number (Optional)</label>
-              <input onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="number" id="phoneNo" name="phoneNo" placeholder="1234567890" />
+              <input value={sendMsg.phoneNo} onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm" type="number" id="phoneNo" name="phoneNo" placeholder="0000000000" />
             </div>
 
             <div className="flex flex-col gap-2 mb-3 lg:mb-4">
               <label htmlFor="msg" className="text-gray-300 text-sm">Your Message</label>
-              <textarea onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm max-h-20 " type="number" name="msg" id="msg" placeholder="Tell us how we can help..." />
+              <textarea value={sendMsg.msg} onChange={onChangeMsg} className="px-3 py-1.5 rounded-xl border border-gray-600 outline-none text-sm max-h-20 " type="number" name="msg" id="msg" placeholder="Tell us how we can help..." />
             </div>
 
-            <button onClick={onSubmitMsg} className="w-full btn-primary text-center py-1 lg:py-1.5 px-3 md:px-4 lg:px-5 text-black rounded-2xl cursor-pointer font-medium mb-5">Submit Message</button>
+            <button onClick={onSubmitMsg} disabled={sendMsgLoading} className="w-full btn-primary text-center py-1 lg:py-1.5 px-3 md:px-4 lg:px-5 text-black rounded-2xl cursor-pointer font-medium mb-5">{sendMsgLoading ? "Sending..." : "Submit Message"}</button>
           </div>
 
         </div>

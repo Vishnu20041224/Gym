@@ -1,11 +1,37 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Check, Clock } from 'lucide-react';
+import axios from 'axios';
 // image
-import Strength from "../assets/img/Strength.png"
-import Cardio from "../assets/img/Cardio.png"
-import Yoga from "../assets/img/Yoga.png"
-import hiit from "../assets/img/hiit.png"
+// import Strength from "../assets/img/Strength.png"
+// import Cardio from "../assets/img/Cardio.png"
+// import Yoga from "../assets/img/Yoga.png"
+// import hiit from "../assets/img/hiit.png"
+import { Link, useNavigate } from 'react-router-dom';
+import { warningToast } from '../lib/toast';
 const Programs = () => {
+
+  const navigate = useNavigate()
+
+
+  const navigateToClassSchedule = async (type) => {
+    try {
+      await axios.get("http://localhost:5000/api/checktoken", {
+        withCredentials: true,
+      });
+
+      navigate(`/class-schedule/${type.toLowerCase()}`);
+    } catch (error) {
+      console.error("Authentication error:", error);
+      warningToast("Login First", error.response?.data?.message || "Please login to view class schedule");
+      navigate("/login");
+    }
+  };
+
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <div className="">
       {/* hero page */}
@@ -24,7 +50,7 @@ const Programs = () => {
 
       <div className='px-3 max-w-6xl mx-auto flex justify-between items-center flex-col md:flex-row  py-6 md:py-8 lg:py-10'>
         <div className='flex-1/2'>
-          <img src={Strength} className='p-1 rounded-2xl' alt="" />
+          <img src={"https://res.cloudinary.com/dlpti92vt/image/upload/v1767850010/Strength_fztkbo.png"} className='p-1 rounded-2xl' alt="" />
         </div>
 
         <div className='flex-1/2 max-md:mt-5'>
@@ -52,7 +78,7 @@ const Programs = () => {
             </ul>
           </div>
 
-          <button className='px-4 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary w-full text-lg cursor-pointer'>View Schedule</button>
+          <button onClick={() => navigateToClassSchedule("strength")} className='block text-center px-4 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary w-full text-lg cursor-pointer'>View Schedule</button>
         </div>
 
       </div>
@@ -86,11 +112,11 @@ const Programs = () => {
             </ul>
           </div>
 
-          <button className='px-4 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary w-full text-lg cursor-pointer'>View Schedule</button>
+          <Link to={"/class-schedule/cardio"} className='block text-center px-4 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary w-full text-lg cursor-pointer'>View Schedule</Link>
         </div>
 
         <div className='flex-1/2 max-md:mt-5'>
-          <img src={Cardio} className='p-1 rounded-2xl' alt="" />
+          <img src={"https://res.cloudinary.com/dlpti92vt/image/upload/v1767850008/Cardio_z8e3yi.png"} className='p-1 rounded-2xl' alt="" />
         </div>
 
       </div>
@@ -104,7 +130,7 @@ const Programs = () => {
         </div>
 
         <div className='py-5 md:py-8 lg:py-10'>
-          <img className='w-full rounded-2xl' src={hiit} alt="" />
+          <img className='w-full rounded-2xl' src={"https://res.cloudinary.com/dlpti92vt/image/upload/v1767850010/hiit_eg1zlm.png"} alt="" />
         </div>
 
         <div className=' grid grid-cols-1 md:grid-cols-2  justify-between gap-2 items-start flex-col md:flex-row'>
@@ -132,16 +158,15 @@ const Programs = () => {
         </div>
 
         <div className='flex justify-center'>
-          <button className=' px-8 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary text-lg cursor-pointer'>View Schedule</button>
+          <Link to={"/class-schedule/hiit"} className=' px-8 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary text-lg cursor-pointer'>View Schedule </Link>
         </div>
       </div>
 
       {/* Yoga: Balance & Flexibility */}
 
-
       <div className='px-3 max-w-6xl mx-auto flex justify-between items-center flex-col md:flex-row  py-6 md:py-8 lg:py-10'>
         <div className='flex-1/2'>
-          <img src={Yoga} className='p-1 rounded-2xl' alt="" />
+          <img src={"https://res.cloudinary.com/dlpti92vt/image/upload/v1767850010/Yoga_jjgvvp.png"} className='p-1 rounded-2xl' alt="" />
         </div>
 
         <div className='flex-1/2 max-md:mt-5'>
@@ -169,10 +194,17 @@ const Programs = () => {
             </ul>
           </div>
 
-          <button className='px-4 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary w-full text-lg cursor-pointer'>View Schedule</button>
+          <Link
+            to={"/class-schedule/yoga"}
+            className="block w-full px-4 mt-3 py-2 rounded-3xl border border-[#FA8C38] text-primary text-lg text-center cursor-pointer"
+          >
+            View Schedule
+          </Link>
         </div>
 
       </div>
+
+
 
     </div>
   )

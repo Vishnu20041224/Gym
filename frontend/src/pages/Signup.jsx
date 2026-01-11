@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { Dumbbell } from "lucide-react";
-import { Link ,useNavigate} from "react-router-dom";
-import axios from "axios"
-
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { successfullyToast, warningToast } from "../lib/toast";
 
 const Signup = () => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     name: "",
@@ -17,155 +22,208 @@ const Signup = () => {
     termsConditions: false,
   });
 
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [generatedOTP, setGeneratedOTP] = useState(null); // store OTP from backend for testing
+  const [loading, setLoading] = useState(false);
+
   // handle all input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // submit form
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // basic validation
-    if (!form.termsConditions) {
-      alert("Please accept Terms & Conditions");
+  // send OTP
+  const handleSendOTP = async () => {
+    if (!form.name || !form.email || !form.phoneNo || !form.password || !form.conformPassword) {
+      warningToast("Sign Up", "Please fill all required fields");
+      return;
+    }
+    if (form.phoneNo.length !== 10) {
+      warningToast("Sign Up", "Phone Number Not Vailed");
       return;
     }
 
     if (form.password !== form.conformPassword) {
-      alert("Passwords do not match");
+      warningToast("Sign Up", "Passwords do not match");
+      return;
+    }
+
+    if (!form.termsConditions) {
+      warningToast("Sign Up", "Accept Terms & Conditions");
       return;
     }
 
     try {
-     
-      const res = await axios.post("http://localhost:3000/api/signup",
+      setLoading(true);
+      const res = await axios.post("http://localhost:5000/api/sendverification", {
+        email: form.email,
+        name: form.name,
+      });
+      console.log("OTP sent:", res.data);
+      setGeneratedOTP(res.data.otp); // save OTP temporarily, in prod use DB/session
+      setOtpSent(true);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // verify OTP and submit signup
+  const handleVerifyAndSignup = async () => {
+    if (otp.length !== 6) {
+      alert("Enter 6-digit OTP");
+      return;
+    }
+
+    if (otp !== String(generatedOTP)) {
+      alert("Incorrect OTP");
+      return;
+    }
+
+    // OTP correct → submit signup
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/signup",
         {
           name: form.name,
           email: form.email,
           phoneNo: form.phoneNo,
           password: form.password,
         },
-        {
-          withCredentials: true, 
-        }
+        { withCredentials: true }
       );
-
       console.log("Signup success:", res.data);
-      navigate("/")
-      scrollTo(0,0)
-
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Signup failed");
+      successfullyToast("Signup", "Account created successfully");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      warningToast("Signup", err.response?.data?.message || "Signup failed");
     }
-
-
   };
 
   return (
     <>
       {/* Logo Header */}
       <div className="flex gap-2 items-center px-5 md:px-8 lg:px-10 py-5">
-        <Dumbbell
-          className="p-2 btn-primary text-black rounded-sm max-md:hidden"
-          size={35}
-        />
-        <Dumbbell
-          className="p-1.5 btn-primary text-black rounded-sm md:hidden"
-          size={25}
-        />
-        <h1 className="text-primary text-sm md:text-xl font-semibold">
-          Apex Athletics
-        </h1>
+        <Dumbbell className="p-2 btn-primary text-black rounded-sm max-md:hidden" size={35} />
+        <Dumbbell className="p-1.5 btn-primary text-black rounded-sm md:hidden" size={25} />
+        <h1 className="text-primary text-sm md:text-xl font-semibold">Apex Athletics</h1>
       </div>
 
-      {/* Signup Form */}
-      <div className="flex flex-col justify-center items-center min-h-screen px-4">
-        <div className="bg-[#1e2128] w-full max-w-md p-6 rounded-2xl">
+      <div className="flex flex-col justify-center items-center min-h-[90vh] px-4">
+        <div className="bg-[#1e2128] w-full max-w-md p-6 rounded-2xl relative">
           <h1 className="pb-4 font-semibold text-4xl text-center">
             Start Your Fitness Journey Today!
           </h1>
-
           <p className="text-center text-[#bdc1ca] pb-6">
-            Join Apex Athletics and unlock expert trainers and exclusive
-            programs.
+            Join Apex Athletics and unlock expert trainers and exclusive programs.
           </p>
 
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-3 w-full"
-          >
-            <input
-              className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white "
-              type="text"
-              name="name"
-              placeholder="Name"
-              value={form.name}
-              onChange={handleChange}
-            />
-
-            <input
-              className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
-              type="email"
-              name="email"
-              placeholder="user@gmail.com"
-              value={form.email}
-              onChange={handleChange}
-            />
-
-            <input
-              className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
-              type="number"
-              name="phoneNo"
-              placeholder="+1 (555) 123-4567"
-              value={form.phoneNo}
-              onChange={handleChange}
-            />
-
-            <input
-              className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-            />
-
-            <input
-              className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
-              type="password"
-              name="conformPassword"
-              placeholder="Confirm Password"
-              value={form.conformPassword}
-              onChange={handleChange}
-            />
-
-            <div className="flex gap-2 items-center mt-4 text-sm">
+          {!otpSent ? (
+            // Signup Form Before OTP
+            <form className="flex flex-col gap-3 w-full" onSubmit={(e) => e.preventDefault()}>
               <input
-                type="checkbox"
-                name="termsConditions"
-                checked={form.termsConditions}
+                className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={form.name}
                 onChange={handleChange}
               />
-              <p>
-                I agree to the{" "}
-                <span className="text-[#FA8C38]">Terms & Conditions</span>
-              </p>
-            </div>
+              <input
+                className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
+                type="email"
+                name="email"
+                placeholder="user@gmail.com"
+                value={form.email}
+                onChange={handleChange}
+              />
+              <input
+                className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
+                type="number"
+                name="phoneNo"
+                placeholder="Phone Number"
+                value={form.phoneNo}
+                onChange={handleChange}
+              />
+              <input
+                className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={handleChange}
+              />
+              <input
+                className="py-2 px-3 rounded-md bg-[#323743] outline-none text-white"
+                type="password"
+                name="conformPassword"
+                placeholder="Confirm Password"
+                value={form.conformPassword}
+                onChange={handleChange}
+              />
+              <div className="flex gap-2 items-center mt-4 text-sm">
+                <input
+                  type="checkbox"
+                  name="termsConditions"
+                  checked={form.termsConditions}
+                  onChange={handleChange}
+                />
+                <p>
+                  I agree to the{" "}
+                  <span className="text-[#FA8C38]">Terms & Conditions</span>
+                </p>
+              </div>
 
-            <button
-              type="submit"
-              className="w-full btn-primary rounded-md py-2 mt-4 text-black"
-            >
-              Create Account
-            </button>
-          </form>
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                className="w-full btn-primary rounded-md py-2 mt-4 text-black"
+                disabled={loading}
+              >
+                {loading ? "Sending OTP..." : "Send Verification OTP"}
+              </button>
+            </form>
+          ) : (
+            // OTP Input after OTP sent
+            <div className="flex flex-col gap-4 w-full">
+              <p className="text-center text-[#bdc1ca]">
+                Enter the 6-digit OTP sent to your email
+              </p>
+
+
+              <div className="flex justify-center items-center">
+
+                <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleVerifyAndSignup}
+                className="w-full btn-primary rounded-md py-2 mt-4 text-black"
+              >
+                Verify OTP & Signup
+              </button>
+            </div>
+          )}
         </div>
 
         <Link to="/login" className="mt-6 text-sm">

@@ -1,7 +1,7 @@
 import express from "express";
+import { verifyPaymentScreenshot,getAllImages} from "../controller/paymentController.js";
 import multer from "multer";
-import { verifyPaymentScreenshot } from "../controller/paymentController.js";
-
+import { authRequied } from "../middleware/authRequied.js";
 const router = express.Router();
 
 // Multer config
@@ -10,29 +10,24 @@ const storage = multer.diskStorage({
         cb(null, "uploads/");
     },
     filename: (req, file, cb) => {
-        cb(
-            null,
-            Date.now() + "-" + file.originalname
-        );
+        cb(null, Date.now() + "-" + file.originalname);
     },
 });
 
 const upload = multer({
     storage,
     fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith("image")) {
-            cb(null, true);
-        } else {
-            cb(new Error("Only image files allowed"), false);
-        }
+        if (file.mimetype.startsWith("image")) cb(null, true);
+        else cb(new Error("Only image files allowed"), false);
     }
 });
 
-// Route
-router.post(
-    "/verify-payment",
-    upload.single("image"),
-    verifyPaymentScreenshot
-);
+
+// Upload & verify payment
+router.post("/verify-payment",authRequied, upload.single("image"), verifyPaymentScreenshot);
+
+
+// Get all uploaded images
+router.get("/all-images", getAllImages);
 
 export default router;

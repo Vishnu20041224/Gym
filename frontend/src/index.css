@@ -4,7 +4,9 @@ body{
   background-color: black;
   color: white;
 }
-
+html {
+  scroll-behavior: smooth;
+}
 :root {
   --primary-color: #FA8C38;
 }

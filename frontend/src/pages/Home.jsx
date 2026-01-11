@@ -1,22 +1,29 @@
 import { useEffect, useState } from "react";
 import HeroPage from "../components/Heropage";
-import aboutImg from "../assets/img/about.png";
 import hiitIcon from "../assets/icone/hiit.png";
-import { Link } from "react-router-dom";
-import { HeartPulse, Dumbbell, LeafyGreen, Check, MapPin, Phone, Mail } from "lucide-react";
-import jhon from "../assets/img/jhon.png"
-import Smith from "../assets/img/Smith.png"
-import Johnson from "../assets/img/Johnson.png"
-import Sarah from "../assets/img/Sarah.png"
-import Mark from "../assets/img/Mark.png"
-import Jessica from "../assets/img/Jessica.png"
-import find from "../assets/img/find.png"
 
+import { Link, useNavigate } from "react-router-dom";
+import { HeartPulse, Dumbbell, LeafyGreen, Check, MapPin, Phone, Mail } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import {
+  getTrainers,
+  getSchedule,
+  getMembershipPlans,
+  getTestimonials,
+  checkAuthenticatedUser,
+} from "../utils/api";
 
 import axios from "axios"
+import { successfullyToast, warningToast } from "../lib/toast";
 const Home = () => {
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const ourTraining = [
     {
       icon: HeartPulse,
@@ -48,106 +55,48 @@ const Home = () => {
     },
   ];
 
-  const trainers = [
-    {
-      name: "John 'The Iron' Doe",
-      type: "Strength & Powerlifting",
-      link: "/",
-      image: jhon
-    },
-    {
-      name: "Jane 'The Agile' Smith",
-      type: "HIIT & Functional Fitness",
-      link: "/",
-      image: Smith
-    },
-    {
-      name: "Mike 'The Zen' Johnson",
-      type: "Vegan & Mobility",
-      link: "/",
-      image: Johnson
+
+  let [trainers, setTrainers] = useState([])
+  let [schedule, setSchedule] = useState([])
+  let [membershipPlans, setMembershipPlans] = useState([])
+  let [testimonials, setTestimonials] = useState([])
+
+  // fetch data from DB
+  async function getData() {
+    try {
+      // admin
+
+      // let res = await checkAuthenticatedUser()
+      // console.log(res.data.user.isAdmin)
+      // if(res.data.user.isAdmin) return navigate("/admin")
+
+      const [
+        trainersRes,
+        scheduleRes,
+        membershipRes,
+        testimonialsRes,
+      ] = await Promise.all([
+        getTrainers(),
+        getSchedule(),
+        getMembershipPlans(),
+        getTestimonials(),
+      ]);
+
+      setTrainers(trainersRes.data.data);
+      setSchedule(scheduleRes.data.data);
+      setMembershipPlans(membershipRes.data.data);
+      setTestimonials(testimonialsRes.data.data);
+
+
+
+    } catch (error) {
+      console.log("Error fetching data:", error);
     }
-  ]
+  }
 
-  const schedule = [
-    {
-      time: "6:00 AM",
-      class: "Morning HIIT",
-      instructor: "Jane Smith"
-    },
-    {
-      time: "9:00 AM",
-      class: "Power Vegan",
-      instructor: "Mike Johnson"
-    },
-    {
-      time: "5:30 PM",
-      class: "Strength Builder",
-      instructor: "John Doe"
-    }
-  ]
-
-  const membershipPlans = [
-    {
-      planType: "Basic Access",
-      amount: 1,
-      about: [
-        "Full Gym Access",
-        "Locker Room",
-        "Basic Classes",
-        "Online Portal"
-      ],
-      choose: "Choose Basic",
-      link: "/"
-    },
-    {
-      planType: "Premium Plus",
-      amount: 1999,
-      about: [
-        "All Basic Features",
-        "Unlimited Classes",
-        "Personal Training (1/month)",
-        "Nutritional Guidance",
-        "Priority Booking"
-      ],
-      choose: "Choose Premium",
-      link: "/"
-    },
-    {
-      planType: "Elite Transformation",
-      amount: 3999,
-      about: [
-        "All Basic Features",
-        "Unlimited Personal Training",
-        "Custom Meal Plans",
-        "24/7 Trainer Support",
-        "Exclusive Workshops"
-      ],
-      choose: "Choose Elite",
-      link: "/"
-    },
-
-  ]
-
-  const testimonials = [
-    {
-      msg: "Apex Athletics completely changed my life. The trainers are incredible, and the community is so supportive!",
-      name: "- Sarah K.",
-      image: Sarah
-
-    },
-    {
-      msg: "I've never been stronger. The personalized programs pushed me beyond what I thought was possible.",
-      name: "- Mark T.",
-      image: Mark
-
-    },
-    {
-      msg: "My mind and body are more connected than ever. The yoga classes are a perfect balance of challenge and calm.",
-      name: "- Jessica L.",
-      image: Jessica
-    }
-  ]
+  useEffect(() => {
+    getData()
+  }, [])
 
   useEffect(() => {
     AOS.init({
@@ -173,49 +122,39 @@ const Home = () => {
 
   // Send Us a Message
 
-  const [sendMsg, setSendMsg] = useState({
-    name: "", email: "", msg: ""
-  })
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    msg: "",
+  });
+
+  let [submitMsgLoading, setSubmitMsgLoading] = useState(false);
 
   const onChangeMsg = (e) => {
-    let { name, value } = e.target
-    sendMsg[name] = value
-  }
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const onSubmitMsg = (e) => {
-    console.log(sendMsg)
-  }
+  const onSubmitMsg = async () => {
+    try {
+      setSubmitMsgLoading(true)
+      const res = await axios.post(
+        "http://localhost:5000/api/getintouch",
+        form
+      );
+      setSubmitMsgLoading(false)
+      successfullyToast("Mail", res.data.message || "Message sent successfully");
+      setForm({
+        name: "",
+        email: "",
+        msg: "",
+      });
 
-  // const payMembership = () => {
-  //   const YOUR_UPI_ID = "rhvishnushankar@oksbi";
-  //   const YOUR_NAME = "Vishnu Shankar";
+    } catch (err) {
+      warningToast("Mail", err.response?.data?.message || "Failed to send message");
+    }
+  };
 
-  //   const getUpiLink = (amount) => {
-  //     return `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(
-  //       YOUR_NAME
-  //     )}&am=${amount}&cu=INR`;
-  //   };
 
-  //   const getQRCodeUrl = (amount) => {
-  //     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-  //       getUpiLink(amount)
-  //     )}`;
-  //   };
-
-  //   // example usage
-  //   const amount = 499;
-  //   const upiLink = getUpiLink(amount);
-  //   const qrCodeUrl = getQRCodeUrl(amount);
-
-  //   console.log(upiLink);
-  //   console.log(qrCodeUrl);
-
-  //   return(
-  //     <div className="h-screen w-full flex justify-center items-center bg-black/40">
-  //       <img className="max-w-3xs aspect-square" src={qrCodeUrl} alt="" />
-  //     </div>
-  //   )
-  // };
 
   const [showQR, setShowQR] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState("");
@@ -223,53 +162,73 @@ const Home = () => {
   const [paymentImage, setPaymentImage] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("");
   const [paidAmount, setPaidAmount] = useState(null);
+  const [membership, setMembership] = useState(null);
 
   const [timeLeft, setTimeLeft] = useState(0);
   const [paymentTimerId, setPaymentTimerId] = useState(null);
 
-  const payMembership = (amount) => {
-    const YOUR_UPI_ID = "rhvishnushankar@oksbi";
-    const YOUR_NAME = "Vishnu Shankar";
+  const payMembership = async (member) => {
+    try {
 
-    const upiLink = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(
-      YOUR_NAME
-    )}&am=${amount}&cu=INR`;
+      // if (cookies.token) {
+      //   warningToast("Login", "Please login to proceed with payment");
+      //   return navigate("/login");
+      // }
 
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-      upiLink
-    )}`;
-
-    setQrCodeUrl(qrUrl);
-    setPaidAmount(amount);
-    setShowQR(true);
-    setPaymentImage(null)
-    setPaymentStatus(""); // Reset previous status
-    setTimeLeft(59); // Start countdown from 60 seconds
-
-    if (paymentTimerId) clearInterval(paymentTimerId);
+      // 🔐 check auth via backend
+      await axios.get(
+        "http://localhost:5000/api/checktoken",
+        { withCredentials: true }
+      );
 
 
-    // Start 1-minute timer
-    const timerId = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timerId);
-          setShowQR(false);
-          setPaymentStatus("⏰ Payment session expired. Please try again.");
-          setPaymentImage(null);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+      const YOUR_UPI_ID = "rhvishnushankar@oksbi";
+      const YOUR_NAME = "Vishnu Shankar";
 
-    setPaymentTimerId(timerId);
+      const upiLink = `upi://pay?pa=${YOUR_UPI_ID}&pn=${encodeURIComponent(
+        YOUR_NAME
+      )}&am=${member.amount}&cu=INR`;
 
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+        upiLink
+      )}`;
+
+      setQrCodeUrl(qrUrl);
+      setPaidAmount(member.amount);
+      setMembership(member)
+      setShowQR(true);
+      setPaymentImage(null)
+      setPaymentStatus(""); // Reset previous status
+      setTimeLeft(180); // Start countdown from 60 seconds
+
+      if (paymentTimerId) clearInterval(paymentTimerId);
+
+
+      // Start 1-minute timer
+      const timerId = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerId);
+            setShowQR(false);
+            setPaymentStatus("⏰ Payment session expired. Please try again.");
+            setPaymentImage(null);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      setPaymentTimerId(timerId);
+    } catch (error) {
+      warningToast("Login required", "Please login to proceed with payment");
+      navigate("/login");
+    }
   };
 
   const handleImageUpload = (e) => {
     setPaymentImage(e.target.files[0]);
   };
+
 
   const submitPaymentProof = async () => {
     if (!paymentImage) {
@@ -277,31 +236,57 @@ const Home = () => {
       return;
     }
 
+    const now = new Date();
+
+    const formatTime = (date) =>
+      date.toLocaleString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      }).replace(",", "").replace("AM", "am").replace("PM", "pm");
+
     const formData = new FormData();
     formData.append("image", paymentImage);
+    formData.append("paymentTime", formatTime(now));
+    formData.append("paymentTimePlus1Min", formatTime(new Date(now.getTime() + 60000)));
+    formData.append("paymentTimePlus2Min", formatTime(new Date(now.getTime() + 120000)));
+    formData.append("membershipPlan", membership.planType);
+    formData.append("amount", membership.amount);
 
-    const res = await axios.post(
-      "http://localhost:3000/api/payment/verify-payment",
-      formData
-    );
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/api/payment/verify-payment",
+        formData,
+        {
+          withCredentials: true, // ✅ send cookies if needed
+        }
+      );
 
-    setPaymentStatus(res.data.message);
-    // Later you will send this to backend
-    console.log(res.data)
+      console.log("Backend response:", res.data);
 
-    if (!res.data.success) {
-      alert(res.data.message);
+      if (!res.data.success) {
+        setPaymentStatus(res.data.message);
+        warningToast("payment", res.data.message || "UPI ID or payment time not Matched in screenshot")
+        return;
+      }
+
+      successfullyToast("Payment", "Payment verified successfully!");
+      setPaymentStatus("✅ Payment submitted for verification");
+      setShowQR(false);
+      setPaymentImage(null);
+
+      if (paymentTimerId) clearInterval(paymentTimerId);
+      setTimeLeft(0);
+
+    } catch (error) {
+      console.error("Error uploading payment screenshot:", error);
+      setPaymentStatus("❌ Failed to submit payment. Try again.");
     }
-
-    setPaymentStatus("✅ Payment submitted for verification");
-    setShowQR(false)
-    setPaymentImage(null);
-
-    // Stop countdown timer
-    if (paymentTimerId) clearInterval(paymentTimerId);
-    setTimeLeft(0);
-
   };
+
 
   return (
     <div className="">
@@ -314,6 +299,7 @@ const Home = () => {
             About Apex Athletics
           </h1>
           <p>Our Mission: Empowering You Towards Peak Performance.</p>
+
         </div>
 
         <div className="flex gap-6 items-center flex-col md:flex-row py-5 md:py-8 lg:py-10 px-2 text-sm md:text-base">
@@ -329,13 +315,14 @@ const Home = () => {
               passion for a healthier, stronger life.
             </p>
 
-            <button className="btn-primary text-black px-4 py-2 rounded-2xl font-medium">
+            <Link to="/trainers" className="btn-primary text-black px-4 py-2 rounded-2xl font-medium">
               Meet Our Trainers
-            </button>
+            </Link>
           </div>
 
           <div data-aos="fade-up" className="flex-1">
-            <img src={aboutImg} alt="About Apex Athletics" />
+            {/* <img src={aboutImg} alt="About Apex Athletics" /> */}
+            <img src={"https://res.cloudinary.com/dlpti92vt/image/upload/v1767850008/about_zhhmpj.png"} className="rounded-xl" alt="About Apex Athletics" />
           </div>
         </div>
       </div>
@@ -370,7 +357,7 @@ const Home = () => {
 
               <p className="py-">{training.msg}</p>
 
-              <Link className="pt-8" to={training.link} >
+              <Link className="pt-8" to={"/programs"} >
                 <button className="px-4 py-2 border border-[#FA8C38] text-primary rounded-xl cursor-pointer">
                   Learn More
                 </button>
@@ -403,7 +390,7 @@ const Home = () => {
                 <h1 className="text-xl font-semibold ">{trani.name}</h1>
                 <h1 className="py-2 text-primary text-sm">{trani.type}</h1>
                 <div className="flex justify-center items-center">
-                  <button className="btn-primary text-center text-black py-1 px-2 rounded-xl cursor-pointer font-medium text-sm"><Link to={trani.link}>View Profile </Link></button>
+                  <button className="btn-primary text-center text-black py-1 px-2 rounded-xl cursor-pointer font-medium text-sm"><Link to={"/trainers"}>View more </Link></button>
                 </div>
               </div>
             </div>))}
@@ -444,7 +431,7 @@ const Home = () => {
             </tbody>
           </table>
 
-          <button className="text-primary border border-[#FA8C38] rounded-xl px-3 py-1.5 cursor-pointer">View Full Schedule</button>
+          <Link to={"/programs"} className="text-primary border border-[#FA8C38] rounded-xl px-3 py-1.5 cursor-pointer">View Full Schedule</Link>
         </div>
 
       </div>
@@ -491,8 +478,8 @@ const Home = () => {
                   ))}
                 </div>
 
-                <button onClick={() => payMembership(member.amount)} className="mt-auto px-4 py-2 border border-gray-800 hover:bg-[#FA8C38] hover:text-black rounded-md transition">
-                  Choose Plan
+                <button onClick={() => payMembership(member)} className="mt-auto px-4 py-2 border border-gray-800 hover:bg-[#FA8C38] hover:text-black rounded-md transition">
+                  Pay Now
                 </button>
 
               </div>
@@ -551,9 +538,9 @@ const Home = () => {
               Submit Payment Proof
             </button>
 
-            <p className="text-xs text-gray-500 mt-2">
+            {/* <p className="text-xs text-gray-500 mt-2">
               ⚠️ Membership will be activated after verification
-            </p>
+            </p> */}
           </div>
         </div>
       )}
@@ -592,48 +579,81 @@ const Home = () => {
 
       {/* Get in Touch */}
 
+
       <div className="max-w-6xl mx-auto py-10 md:py-16 lg:py-20">
-        <div className="flex justify-center items-center flex-col gap-3 text-center pb-3 md:pb-6 lg:pb-9">
-          <h1 className="text-2xl lg:text-4xl font-medium">
-            Get in Touch
-          </h1>
-          <p className="text-xm md:text-base">We're Here to Help You Achieve Your Goals.</p>
+        <div className="flex justify-center items-center flex-col gap-3 text-center pb-6">
+          <h1 className="text-2xl lg:text-4xl font-medium">Get in Touch</h1>
+          <p>We're Here to Help You Achieve Your Goals.</p>
         </div>
 
         <div
+          className="flex-1 flex gap-6 items-start flex-col md:flex-row py-5 md:py-8 lg:py-10 px-2 text-sm md:text-base"
           data-aos="fade-up"
-          data-aos-duration="2000"
+          data-aos-duration="2000">
 
-          className="flex gap-6 items-start flex-col md:flex-row py-5 md:py-8 lg:py-10 px-2 text-sm md:text-base">
+
+
           <div className="flex-1 w-full">
-            <h1 className="pb-5 font-semibold text-xl md:text-xl lg:text-2xl">Send Us a Message</h1>
+            <h1 className="pb-5 font-semibold text-2xl">Send Us a Message</h1>
+
             <div className="flex flex-col gap-4">
-              <input onChange={onChangeMsg} className="bg-[#565d6d] text-white py-1.5 px-2 rounded-md" type="text" name="name" placeholder="Your Name" />
-              <input onChange={onChangeMsg} className="bg-[#565d6d] text-white py-1.5 px-2 rounded-md" type="text" name="email" placeholder="Your Email" />
-              <textarea onChange={onChangeMsg} className="bg-[#565d6d] text-white py-1.5 px-2 rounded-md max-h-20" name="msg" id="" placeholder="Your Message" />
-              <button onClick={onSubmitMsg} className="py-1.5 px-2 btn-primary rounded-md cursor-pointer">Send Message</button>
+              <input
+                name="name"
+                value={form.name}
+                onChange={onChangeMsg}
+                placeholder="Your Name"
+                className="bg-[#565d6d] text-white py-2 px-3 rounded"
+              />
+
+              <input
+                name="email"
+                value={form.email}
+                onChange={onChangeMsg}
+                placeholder="Your Email"
+                className="bg-[#565d6d] text-white py-2 px-3 rounded"
+              />
+
+              <textarea
+                name="msg"
+                value={form.msg}
+                onChange={onChangeMsg}
+                placeholder="Your Message"
+                className="bg-[#565d6d] text-white py-2 px-3 rounded"
+              />
+
+              <button
+                onClick={onSubmitMsg}
+                className="btn-primary py-2 rounded cursor-pointer text-black font-medium"
+              >
+                {submitMsgLoading ? "Sending..." : "Send Message"}
+              </button>
             </div>
           </div>
-
 
           <div
             data-aos="fade-up"
             data-aos-duration="2000"
-            className="flex-1 ">
+            className="flex-1">
             <h1 className="pb-5 font-semibold text-xl md:text-xl lg:text-2xl">Find Us</h1>
             <h1 className="flex gap-2 items-center mb-4">
-              <MapPin color="#FA8C38" /> 123 Fitness Ave, Suite 400, Metropolis, MA 01234
+              <MapPin color="#FA8C38" /> Chromepet, Chennai, Tamil Nadu 600044
             </h1>
             <h1 className="flex gap-2 items-center mb-4">
-              <Phone color="#FA8C38" /> (555) 123-4567
+              <Phone color="#FA8C38" />9176017127
             </h1>
             <h1 className="flex gap-2 items-center mb-4">
-              <Mail color="#FA8C38" /> info@apexathletics.com
+              <Mail color="#FA8C38" /> rhvishnushankar@gamil.com
             </h1>
-            <img className="p-1 rounded-2xl" src={find} alt="find" />
+            <img className="p-1 rounded-2xl" src={"https://res.cloudinary.com/dlpti92vt/image/upload/v1767850009/find_n7i4or.png"} alt="find" />
           </div>
+
+
+
+
+
         </div>
       </div>
+
 
 
     </div>

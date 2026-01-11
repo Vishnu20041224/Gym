@@ -16,12 +16,33 @@ const userSchema = new mongoose.Schema(
     phoneNo: {
       type: String,
       required: true,
-      minlength: 9
+      minlength: 9,
+      maxlength:10
     },
     password: {
       type: String,
       required: true,
       minlength: 6
+    },
+    userImage:{
+      type:String,
+      default:null
+    },
+    bio:{
+      type:String,
+      default:null
+    },
+     isMembership: {
+      type: Boolean,
+      default:false,
+    },
+    MembershipPlan: {
+      type: String,
+      default:null,
+    },
+    paymentStatus: {
+      type: String,
+      default:null,
     },
     isAdmin:{
       type:Boolean,

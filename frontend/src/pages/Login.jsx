@@ -1,19 +1,20 @@
 import { Dumbbell } from 'lucide-react'
 import React, { useState } from 'react'
-import { Link ,useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
-
+import { warningToast } from '../lib/toast'
+import { useCookies } from 'react-cookie'
 const Login = () => {
 
   const navigate = useNavigate()
-
+  let [cookies, setCookie, removeCookie] = useCookies(["token"]);
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
 
   // handle all input changes
-  const handleChange =async (e) => {
+  const handleChange = async (e) => {
     const { name, value, type, checked } = e.target;
 
     setForm((prev) => ({
@@ -23,28 +24,30 @@ const Login = () => {
   };
 
   // submit form
-  const handleSubmit =async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
 
-      const res = await axios.post("http://localhost:3000/api/login",
+      const res = await axios.post("http://localhost:5000/api/login",
         {
           email: form.email,
           password: form.password,
         },
         {
-          withCredentials: true,
+          withCredentials: true, // 🔥 REQUIRED
         }
       );
 
       console.log("Login success:", res.data);
+      
+      if(res.data.user.isAdmin) return navigate("/admin")
+
       navigate("/")
       scrollTo(0, 0)
 
     } catch (error) {
       console.error(error);
-      alert(error.response?.data?.message || "Signup failed");
+      warningToast("Login Failed", error.response?.data?.message || "Signup failed")
     }
   };
 

@@ -1,7 +1,10 @@
 import jwt from "jsonwebtoken"
 import bcryptjs from "bcryptjs"
 import { User } from "../model/userModel.js"
-
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
+import dotenv from "dotenv";
+dotenv.config();
 
 const signupToken = ({ _id, name, email, phoneNo }) => {
     return jwt.sign(
@@ -38,10 +41,10 @@ export const signup = async (req, res) => {
         })
 
         res.cookie("token", token, {
-            httpOnly: true,
-            secure: false,      // HTTPS only in production
-            sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            httpOnly: true,      // ✅ safer, JS cannot read it
+            secure: false,       // false on localhost, true in HTTPS production
+            sameSite: "lax",     // or "none" if cross-site in production
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         });
 
         res.status(201).json({
@@ -78,7 +81,7 @@ export const login = async (req, res) => {
             httpOnly: true,
             secure: false,      // HTTPS only in production
             sameSite: "lax",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
+            maxAge: 30 * 24 * 60 * 60 * 1000,
         });
 
         res.json({ message: "Login successful", user });
@@ -88,3 +91,96 @@ export const login = async (req, res) => {
     }
 }
 
+export const logoutUser = async (req, res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: false,      
+            sameSite: "lax",
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Logout failed",
+        });
+    }
+};
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, bio } = req.body;
+
+    let profileImageUrl;
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "users",
+        width: 500,
+        crop: "scale",
+      });
+
+      profileImageUrl = result.secure_url;
+
+      // 🔥 delete temp file
+      fs.unlinkSync(req.file.path);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        ...(name && { name }),
+        ...(bio && { bio }),
+        ...(profileImageUrl && { userImage: profileImageUrl }),
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update profile",
+    });
+  }
+};
+
+export const getUser = async (req, res) => {
+    try {
+
+        let user = await User.find({})
+        if (!user) return res.status(404).json({ success: false, message: "User Not Found" })
+
+        res.status(200).json({ success: true, data: user })
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message || "Server error" });
+
+    }
+}
+
+export const getOneUser = async (req, res) => {
+    try {
+        let { id } = req.params
+        if (!id) return res.status(404).json({ success: false, message: "User ID is required" })
+
+        let user = await User.findById(id)
+        if (!user) return res.status(404).json({ success: false, message: "User Not Found" })
+
+        res.status(200).json({ success: true, data: user })
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message || "Server error" });
+
+    }
+}
