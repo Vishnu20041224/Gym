@@ -122,7 +122,7 @@ const Nav = () => {
                     )}
                      <h1>Profile</h1>
                   </NavLink> :
-                  <NavLink to={"/login"}>Join Now</NavLink>}
+                  <NavLink to={"/profile"}>Join Now</NavLink>}
               </div>
             </div>
           </div>

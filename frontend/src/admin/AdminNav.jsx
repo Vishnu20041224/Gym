@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { MenuIcon, X, Dumbbell } from "lucide-react"
+import { MenuIcon, X, Dumbbell, CircleUserRound } from "lucide-react"
 import { checkAuthenticatedUser } from '../utils/api'
 
 const AdminNav = () => {
     const [open, setOpen] = useState(false)
     const [userName, setUserName] = useState(null)
+    const [userData, setUserData] = useState(null)
+
+
 
     const getUser = async () => {
         try {
             const res = await checkAuthenticatedUser()
             if (res.data.success) {
                 setUserName(res.data.user.name)
+                setUserData(res.data.user)
+                console.log(res.data.user)
             }
         } catch (error) {
             console.log("User not logged in");
@@ -57,12 +62,28 @@ const AdminNav = () => {
                     </div>
 
                     {/* Desktop Button */}
-                    <Link
-                        to={"/login"}
-                        className={`${userName ? "text-primary text-sm underline underline-offset-4" : "btn-primary text-black text-base"} font-semibold px-3.5 py-1 rounded-lg max-md:hidden`}
+                    <div
+                        className={`btn-primar text-base font-semibold px-3.5 py-1 rounded-lg max-md:hidden`}
                     >
-                        {userName || "Join Now"}
-                    </Link>
+                        {userName ?
+                            <NavLink to={"/profile"} className={({ isActive }) => isActive ? "text-primary flex gap-2 items-center" : "flex gap-2 items-center"}>
+                                {userData.userImage ? (
+                                    <img
+                                        src={userData.userImage}
+                                        alt="profile"
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                ) : (
+                                    <CircleUserRound
+                                        className="rounded-full border-[#FA8C38]"
+                                        size={30}
+                                    />
+                                )}
+                                <h1>Profile</h1>
+                            </NavLink> :
+                            <NavLink to={"/login"} className={"btn-primary text-black px-4 py-1.5 rounded-lg inline-block font-semibold"}>Join Now</NavLink>}
+
+                    </div>
 
                     {/* Mobile Icon */}
                     <MenuIcon className="md:hidden cursor-pointer" onClick={() => setOpen(true)} />
@@ -80,11 +101,27 @@ const AdminNav = () => {
                             <Link to="/programs" onClick={() => setOpen(false)}>Programs</Link>
                             <Link to="/trainers" onClick={() => setOpen(false)}>Trainers</Link>
                             <Link to="/contact" onClick={() => setOpen(false)}>Contact</Link>
-                            <Link
-                                to={"/login"}
-                                className={`${userName ? "text-primary text-xl underline underline-offset-4" : "btn-primary text-black text-xl"} px-4 py-2  rounded-xl `}>
-                                {userName || "Join Now"}
-                            </Link>
+                            <div
+                                onClick={() => setOpen(false)}
+                                className={`"btn-primary text-black text-xl"} px-4 py-2  rounded-xl `}>
+                                {userName ?
+                                    <NavLink to={"/profile"} className={({ isActive }) => isActive ? "text-primary flex gap-2 items-center" : "flex gap-2 items-center text-white"}>
+                                        {userData.userImage ? (
+                                            <img
+                                                src={userData.userImage}
+                                                alt="profile"
+                                                className="w-8 h-8 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <CircleUserRound
+                                                className="rounded-full border-[#FA8C38]"
+                                                size={30}
+                                            />
+                                        )}
+                                        <h1>Profile</h1>
+                                    </NavLink> :
+                                    <NavLink to={"/profile"}>Join Now</NavLink>}
+                            </div>
                         </div>
                     </div>
                 )}

@@ -19,15 +19,20 @@ const AdminHomePage = () => {
 
     let user = await isAdmin()
     console.log(user.data)
-    if (user.data.user.isAdmin) {
-      let res = await getAllUser()
-      setTotalMembership(res.data.data.filter((d) => d.isMembership).length)
-      setTotalUser(res.data.data.length)
-      let classSchedul = await getAllClassSchedule()
-      setUpcomingClasses(classSchedul.data.data.filter((d) => d.available === false).length)
+
+    if (!user.data.user.isAdmin) {
+      console.log("isAdmin", user.data.user.isAdmin)
+      navigate("/")
+      warningToast("warning", "Only for Admin Access")
     }
-    warningToast("Warning","Its Only for Admin access")
-    navigate("/")
+
+    let res = await getAllUser()
+    setTotalMembership(res.data.data.filter((d) => d.isMembership).length)
+    setTotalUser(res.data.data.length)
+    let classSchedul = await getAllClassSchedule()
+    setUpcomingClasses(classSchedul.data.data.filter((d) => d.available === false).length)
+
+
 
   }
 
