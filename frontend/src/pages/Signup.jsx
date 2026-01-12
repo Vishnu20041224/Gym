@@ -59,7 +59,7 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/sendverification", {
+      const res = await axios.post("https://vishnu-gym-backend-server.onrender.com/api/sendverification", {
         email: form.email,
         name: form.name,
       });
@@ -89,7 +89,7 @@ const Signup = () => {
     // OTP correct → submit signup
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/signup",
+        "https://vishnu-gym-backend-server.onrender.com/api/signup",
         {
           name: form.name,
           email: form.email,

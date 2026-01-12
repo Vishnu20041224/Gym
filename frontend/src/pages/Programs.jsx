@@ -15,7 +15,7 @@ const Programs = () => {
 
   const navigateToClassSchedule = async (type) => {
     try {
-      await axios.get("http://localhost:5000/api/checktoken", {
+      await axios.get("https://vishnu-gym-backend-server.onrender.com/api/checktoken", {
         withCredentials: true,
       });
 
