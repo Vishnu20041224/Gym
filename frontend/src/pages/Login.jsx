@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 import { warningToast } from '../lib/toast'
 import { useCookies } from 'react-cookie'
+import { login } from '../utils/api'
 const Login = () => {
 
   const navigate = useNavigate()
@@ -28,17 +29,10 @@ const Login = () => {
     e.preventDefault();
     try {
 
-      const res = await axios.post("http://localhost:5000/api/login",
-        {
-          email: form.email,
-          password: form.password,
-        },
-        {
-          withCredentials: true, // 🔥 REQUIRED
-        }
-      );
-
-      console.log("Login success:", res.data);
+      const res = await login({
+        email: form.email,
+        password: form.password,
+      });
 
       if (res.data.user.isAdmin) return navigate("/admin")
 
@@ -46,7 +40,6 @@ const Login = () => {
       scrollTo(0, 0)
 
     } catch (error) {
-      console.error(error);
       warningToast("Login Failed", error.response?.data?.message || "Signup failed")
     }
   };

@@ -12,6 +12,8 @@ import {
   getMembershipPlans,
   getTestimonials,
   checkAuthenticatedUser,
+  paymentVerify,
+  getInTouch,
 } from "../utils/api";
 
 import axios from "axios"
@@ -90,7 +92,7 @@ const Home = () => {
 
 
     } catch (error) {
-      console.log("Error fetching data:", error);
+      warningToast("Error", "Failed to fetch data");
     }
   }
 
@@ -137,13 +139,9 @@ const Home = () => {
   const onSubmitMsg = async () => {
     try {
       setSubmitMsgLoading(true)
-      const res = await axios.post(
-        "http://localhost:5000/api/getintouch",
-        form,
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await getInTouch(form);
+      if (!res.data.success) return warningToast("Mail", "Failed to send message");
+
       setSubmitMsgLoading(false)
       successfullyToast("Mail", res.data.message || "Message sent successfully");
       setForm({
@@ -173,17 +171,8 @@ const Home = () => {
   const payMembership = async (member) => {
     try {
 
-      // if (cookies.token) {
-      //   warningToast("Login", "Please login to proceed with payment");
-      //   return navigate("/login");
-      // }
-
       // 🔐 check auth via backend
-      await axios.get(
-        "http://localhost:5000/checktoken",
-        { withCredentials: true }
-      );
-
+      await checkAuthenticatedUser()
 
       const YOUR_UPI_ID = "rhvishnushankar@oksbi";
       const YOUR_NAME = "Vishnu Shankar";
@@ -260,15 +249,7 @@ const Home = () => {
     formData.append("amount", membership.amount);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/payment/verify-payment",
-        formData,
-        {
-          withCredentials: true, // ✅ send cookies if needed
-        }
-      );
-
-      console.log("Backend response:", res.data);
+      const res = await paymentVerify(formData);
 
       if (!res.data.success) {
         setPaymentStatus(res.data.message);

@@ -8,6 +8,7 @@ import axios from 'axios';
 // import hiit from "../assets/img/hiit.png"
 import { Link, useNavigate } from 'react-router-dom';
 import { warningToast } from '../lib/toast';
+import { checkAuthenticatedUser } from '../utils/api';
 const Programs = () => {
 
   const navigate = useNavigate()
@@ -15,13 +16,10 @@ const Programs = () => {
 
   const navigateToClassSchedule = async (type) => {
     try {
-      await axios.get("http://localhost:5000/api/checktoken", {
-        withCredentials: true,
-      });
+      await checkAuthenticatedUser()
 
       navigate(`/class-schedule/${type.toLowerCase()}`);
     } catch (error) {
-      console.error("Authentication error:", error);
       warningToast("Login First", error.response?.data?.message || "Please login to view class schedule");
       navigate("/login");
     }

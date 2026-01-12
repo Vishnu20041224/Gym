@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { MapPin, Phone, Mail, Youtube, Facebook, Twitter, Instagram, Clock, } from "lucide-react";
 import axios from "axios";
 import { successfullyToast, warningToast } from "../lib/toast";
+import { postContactMail } from "../utils/api";
 const Contact = () => {
 
   // Send Us a Message
@@ -23,14 +24,14 @@ const Contact = () => {
 
   const onSubmitMsg = async (e) => {
     try {
-      console.log(sendMsg)
       setSendMsgLoading(true)
 
       // Simulate API call
 
-      await axios.post("http://localhost:5000/api/contact", sendMsg)
-      successfullyToast("Mail", "Message sent successfully");
+      let res = await postContactMail(sendMsg)
+      if (!res.success) return warningToast("Mail", "Failed to send message");
 
+      successfullyToast("Mail", "Message sent successfully");
 
       setSendMsg({
         firstName: "", lastName: "", email: "", phoneNo: "", msg: ""

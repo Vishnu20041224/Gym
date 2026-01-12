@@ -9,6 +9,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { successfullyToast, warningToast } from "../lib/toast";
+import { sendverification, signup } from "../utils/api";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -59,15 +60,13 @@ const Signup = () => {
 
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:5000/api/sendverification", {
+      const res = await sendverification({
         email: form.email,
         name: form.name,
       });
-      console.log("OTP sent:", res.data);
       setGeneratedOTP(res.data.otp); // save OTP temporarily, in prod use DB/session
       setOtpSent(true);
     } catch (err) {
-      console.error(err);
       alert(err.response?.data?.message || "Failed to send OTP");
     } finally {
       setLoading(false);
@@ -88,21 +87,17 @@ const Signup = () => {
 
     // OTP correct → submit signup
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/signup",
+      const res = await signup(
         {
           name: form.name,
           email: form.email,
           phoneNo: form.phoneNo,
           password: form.password,
-        },
-        { withCredentials: true }
+        }
       );
-      console.log("Signup success:", res.data);
       successfullyToast("Signup", "Account created successfully");
       navigate("/");
     } catch (err) {
-      console.error(err);
       warningToast("Signup", err.response?.data?.message || "Signup failed");
     }
   };

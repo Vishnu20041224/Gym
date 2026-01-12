@@ -8,6 +8,8 @@ const API = axios.create({
     withCredentials: true
 });
 
+// FETCH DATA
+
 //    TRAINERS
 
 export const getTrainers = async () => {
@@ -43,6 +45,49 @@ export const getClassSchedule = async (classType) => {
     return API.get(`/class-schedule/${classType}`);
 }
 
+// PAYMENT API
+
+export const paymentVerify = async (data) => {
+    return API.post("/payment/verify-payment", data);
+}
+
+
+// GET IN TOACH 
+
+export const getInTouch = async (data) => {
+    return API.post("/getintouch", data);
+}
+
+// AUTHENTICATED USER
+
+// LOGIN 
+
+export const login = async (data) => {
+    return API.post("/login", data);
+}
+
+export const sendverification = async (data) => {
+    return API.post("/sendverification", data);
+}
+
+export const signup = async (data) => {
+    return API.post("/signup", data);
+}
+
+// update profile
+
+export const updateProfile = async (data) => {
+    return API.put("/update-profile", data);
+}
+
+// Contact Mail
+
+export const postContactMail = async (data) => {
+    return API.post("/contact", data);
+}
+
+
+// POST Class Schedule DATA
 
 export const postSelectClassSchedule = async (id) => {
     return API.post(`/class-schedule/${id}`);
@@ -105,10 +150,10 @@ export const cancelledMailSelectClassSchedule = async (userId, scheduleTimeId) =
 
 export const sendUserMail = async ({ email, name, message }) => {
     return API.post(`/send-user-mail`, { email, name, message })
-} 
+}
 export const sendAllUserMail = async (message) => {
-    return API.post(`/send-all-user-mail`, {message })
-} 
+    return API.post(`/send-all-user-mail`, { message })
+}
 
 
 // get-all-class-schedule

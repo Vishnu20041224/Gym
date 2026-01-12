@@ -1,7 +1,7 @@
 import { CircleUserRound, Loader } from 'lucide-react';
 import { useEffect } from 'react';
 import { useState } from 'react';
-import { cancelledSelectClassSchedule, checkAuthenticatedUser, getOneUser, getUserClassSchedule, logoutUser } from '../utils/api';
+import { cancelledSelectClassSchedule, checkAuthenticatedUser, getOneUser, getUserClassSchedule, logoutUser, updateProfile } from '../utils/api';
 import { successfullyToast, warningToast } from '../lib/toast';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button"
@@ -44,7 +44,6 @@ const Profile = () => {
     };
 
     const cancelSchedule = async (sch) => {
-        console.log(sch)
         setIsCanceling(true)
         setClassSchedule((pres) => pres.filter((p) => p._id !== sch._id))
         await cancelledSelectClassSchedule(sch._id)
@@ -57,10 +56,8 @@ const Profile = () => {
         try {
             const user = await checkAuthenticatedUser()
             if (user.data.success) {
-                console.log(user.data.user.name)
                 setUserName(user.data.user.name)
                 setUserData(user?.data?.user)
-                console.log(userData)
             }
 
             let res = await getUserClassSchedule()
@@ -82,10 +79,9 @@ const Profile = () => {
                 );
 
                 setUsersMap(users);
-                console.log(usersMap)
             }
         } catch (error) {
-            console.log(error.message)
+            warningToast("User Data", error.message)
         }
     }
 
@@ -96,42 +92,9 @@ const Profile = () => {
             successfullyToast("Log Out", "Log Out Success Fully")
             navigate("/login")
         } catch (error) {
-            console.log("error", error.message)
             warningToast("Log Out", error.message)
         }
     }
-
-    // const handleEditProfile = async (e) => {
-    //     e.preventDefault();
-
-    //     const formData = new FormData();
-    //     formData.append("name", e.target.name.value);
-    //     formData.append("bio", e.target.bio.value);
-
-    //     if (e.target.userImage.files[0]) {
-    //         formData.append("userImage", e.target.userImage.files[0]);
-    //     }
-
-    //     try {
-    //         const res = await axios.put(
-    //             "http://localhost:5000/api/update-profile",
-    //             formData,
-    //             { withCredentials: true }
-    //         );
-
-    //         if (res.data.success) {
-    //             successfullyToast("Profile", "Profile updated successfully");
-    //             setUserData(res.data.data);
-    //             setUserName(res.data.data.name);
-    //         }
-    //     } catch (error) {
-    //         console.error(error);
-    //         warningToast(
-    //             "Profile",
-    //             error.response?.data?.message || "Failed to update profile"
-    //         );
-    //     }
-    // };
 
     const handleEditProfile = async (e) => {
         e.preventDefault();
@@ -145,11 +108,7 @@ const Profile = () => {
         }
 
         try {
-            const res = await axios.put(
-                "http://localhost:5000/api/update-profile",
-                formData,
-                { withCredentials: true }
-            );
+            const res = await updateProfile(formData);
 
             if (res.data.success) {
                 setOpenEdit(false);

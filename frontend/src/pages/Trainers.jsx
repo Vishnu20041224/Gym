@@ -1,91 +1,13 @@
 import React, { useState } from 'react'
-// import Samantha from "../assets/img/Samantha.png"
-// import Michael from "../assets/img/Michael.png"
-// import JessicaWhite from "../assets/img/JessicaWhite.png"
-// import David from "../assets/img/David.png"
-// import Emily from "../assets/img/Emily.png"
-// import Chris from "../assets/img/Chris.png"
-// import Olivia from "../assets/img/Olivia.png"
-// import Daniel from "../assets/img/Daniel.png"
-
 import { Check } from 'lucide-react';
 import { useEffect } from 'react'
-import { getCoachs } from '../utils/api';
+import { checkAuthenticatedUser, getCoachs } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { warningToast } from '../lib/toast';
 import axios from 'axios';
 const Trainers = () => {
 
-  // const coachstype = [
-  //   "All",
-  //   "Strength & Conditioning",
-  //   "HIIT & Cardio",
-  //   "Yoga & Flexibility",
-  //   "Functional Training",
-  //   "Nutrition & Wellness",
-  //   "Weight Management",
-  //   "Pre & Post Natal Fitness",
-  //   "Sports Performance"
-  // ]
 
-  // const coachs = [
-  //   {
-  //     name: "Samantha Lee",
-  //     type: "Strength & Conditioning",
-  //     msg: "Samantha is a certified strength coach dedicated to helping clients build power, endurance, and",
-  //     certifications: ["CSCS", "NASM-CPT", "Precision Nutrition"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850009/Samantha_fliopa.png"
-  //   },
-  //   {
-  //     name: "Michael Chen",
-  //     type: "HIIT & Cardio",
-  //     msg: "Michael's high-energy HIIT sessions are designed to push limits and maximize calorie burn, making",
-  //     certifications: ["ACSM-CPT", "Kettlebell Level 1", "TRX Certified"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850008/Michael_ddg4tj.png"
-  //   },
-  //   {
-  //     name: "Jessica White",
-  //     type: "Yoga & Flexibility",
-  //     msg: "Jessica's holistic approach to yoga focuses on mindful movement, improving flexibility, balance, and inner peace. She helps clients connect mind and body.",
-  //     certifications: ["RYT 500", "Yoga Alliance Certified", "Pilates Instructor"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850010/JessicaWhite_zezey3.png"
-  //   },
-  //   {
-  //     name: "David Kim",
-  //     type: "Functional Training",
-  //     msg: "David specializes in movements that improve everyday strength and prevent injury, helping clients move better and live healthier. He emphasizes practical strength.",
-  //     certifications: ["ACE-CPT", "FMS Certified", "Corrective Exercise"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850009/David_hjgozt.png"
-  //   },
-  //   {
-  //     name: "Emily Rodriguez",
-  //     type: "Nutrition & Wellness",
-  //     msg: "Emily combines fitness coaching with nutritional guidance to empower clients to achieve sustainable health and body transformations. Her approach is holistic and sustainable.",
-  //     certifications: ["ISSN-SNS", "NASM-WLS", "Certified Health Coach"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850009/Emily_uzkk9f.png"
-  //   },
-  //   {
-  //     name: "Chris Evans",
-  //     type: "Weight Management",
-  //     msg: "Chris provides personalized strategies for effective weight loss and muscle gain, focusing on long-term lifestyle changes. He helps build habits for lasting success.",
-  //     certifications: ["NSCA-CPT", "ISSA-CFT", "Weight Loss Specialist"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850008/Chris_v5q6ga.png"
-  //   },
-  //   {
-  //     name: "Olivia Grace",
-  //     type: "Pre & Post Natal Fitness",
-  //     msg: "Olivia supports mothers through safe and effective fitness routines tailored for pregnancy and postpartum recovery. She ensures a supportive and nurturing environment.",
-  //     certifications: ["Pre/Postnatal Cert", "CPPC", "Women's Fitness Specialist"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850008/Olivia_hkuo59.png"
-  //   },
-  //   {
-  //     name: "Daniel Wong",
-  //     type: "Sports Performance",
-  //     msg: "Daniel helps athletes enhance their agility, speed, and power, optimizing performance for competitive sports. He customizes training for peak athletic output.",
-  //     certifications: ["CSCS", "USA Weightlifting", "Functional Movement"],
-  //     image: "https://res.cloudinary.com/dlpti92vt/image/upload/v1767850009/Daniel_mihr6p.png"
-  //   },
-  // ]
 
   const navigate = useNavigate();
 
@@ -109,15 +31,9 @@ const Trainers = () => {
   const navigateToClassSchedule = async (type) => {
     console.log(type);
     try {
-     let res =  await axios.get("http://localhost:5000/api/checktoken", {
-        withCredentials: true,
-      });
-
-      console.log(res.data);
-
+      let res = await checkAuthenticatedUser()
       navigate(`/class-schedule/${type.toLowerCase()}`);
     } catch (error) {
-      console.error("Authentication error:", error);
       warningToast("Login First", error.response?.data?.message || "Please login to view class schedule");
       navigate("/login");
     }
