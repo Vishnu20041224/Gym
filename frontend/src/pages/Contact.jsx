@@ -28,7 +28,7 @@ const Contact = () => {
 
       // Simulate API call
 
-      await axios.post("http://localhost:5000/api/contact",sendMsg)
+      await axios.post("https://vishnu-gym-backend-server.onrender.com/api/contact",sendMsg)
       successfullyToast("Mail", "Message sent successfully");
 
 
