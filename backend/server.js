@@ -30,7 +30,7 @@ app.use(cookieParser());
 // Middleware
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://your-frontend.onrender.app"],
+  origin: ["http://localhost:5173", "https://vs-gym.onrender.com"],
   credentials: true
 }));
 
