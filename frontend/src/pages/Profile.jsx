@@ -146,7 +146,7 @@ const Profile = () => {
 
         try {
             const res = await axios.put(
-                "http://localhost:5000/api/update-profile",
+                "https://vishnu-gym-backend-server.onrender.com/api/update-profile",
                 formData,
                 { withCredentials: true }
             );
