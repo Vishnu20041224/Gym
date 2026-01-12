@@ -8,12 +8,11 @@ import Home from "./pages/Home"
 import Contact from './pages/Contact'
 import Programs from './pages/Programs'
 import Trainers from './pages/Trainers'
-import Login from './pages/login'
+import Login from "./pages/Login"
 import Signup from './pages/Signup'
 import Footer from './components/Footer'
 import ClassSchedule from './pages/ClassSchedule'
-import adminNav from './admin/adminNav'
-import AdminNav from './admin/adminNav'
+import AdminNav from "./admin/AdminNav"
 import AdminHomePage from './admin/page/AdminHomePage'
 import AdminClassSchedule from './admin/page/AdminClassSchedule'
 import AllUser from './admin/page/AllUser'
