@@ -30,7 +30,7 @@ app.use(cookieParser());
 // Middleware
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://vs-gym.onrender.com"],
+  origin: ["http://localhost:5173"],
   credentials: true
 }));
 
@@ -42,25 +42,25 @@ app.use("/uploads", express.static("uploads"));
 
 // router
 
-app.get("/",(req,res)=>{
-    res.json("server was runing")
+app.get("/", (req, res) => {
+  res.json("server was runing")
 })
-app.use("/api",authRoter)
+app.use("/api", authRoter)
 app.use("/api/payment", paymentRoutes);
 app.use("/api", contactRoute);
 
-app.use("/api",OurTrainingRouter)
-app.use("/api",trainingRouter)
-app.use("/api",scheduleRoute)
-app.use("/api",membershipPlansRoute)
-app.use("/api",testimonialsRoute)
-app.use("/api",coachsRoute)
-app.use("/api",classScheduleRoute)
-app.use("/api",adminClassScheduleRouter)
+app.use("/api", OurTrainingRouter)
+app.use("/api", trainingRouter)
+app.use("/api", scheduleRoute)
+app.use("/api", membershipPlansRoute)
+app.use("/api", testimonialsRoute)
+app.use("/api", coachsRoute)
+app.use("/api", classScheduleRoute)
+app.use("/api", adminClassScheduleRouter)
 
 
 app.listen(process.env.PORT, () => {
-    console.log(`server was runing in ${process.env.PORT}`)
-    dbConnect(process.env.MONGODB_URL)
-    // seed(process.env.MONGODB_URL)
+  console.log(`server was runing in ${process.env.PORT}`)
+  dbConnect(process.env.MONGODB_URL)
+  // seed(process.env.MONGODB_URL)
 })

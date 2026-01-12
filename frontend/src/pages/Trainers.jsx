@@ -109,7 +109,7 @@ const Trainers = () => {
   const navigateToClassSchedule = async (type) => {
     console.log(type);
     try {
-     let res =  await axios.get("https://vishnu-gym-backend-server.onrender.com/api/checktoken", {
+     let res =  await axios.get("http://localhost:5000/api/checktoken", {
         withCredentials: true,
       });
 

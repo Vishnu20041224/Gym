@@ -75,6 +75,7 @@ export const login = async (req, res) => {
             email: user.email,
             phoneNo: user.phoneNo,
         });
+        console.log(token)
 
         // 🍪 Send cookie
         res.cookie("token", token, {
@@ -95,7 +96,7 @@ export const logoutUser = async (req, res) => {
     try {
         res.clearCookie("token", {
             httpOnly: true,
-            secure: false,      
+            secure: false,
             sameSite: "lax",
         });
 
@@ -112,47 +113,47 @@ export const logoutUser = async (req, res) => {
 };
 
 export const updateProfile = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { name, bio } = req.body;
+    try {
+        const userId = req.user._id;
+        const { name, bio } = req.body;
 
-    let profileImageUrl;
+        let profileImageUrl;
 
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "users",
-        width: 500,
-        crop: "scale",
-      });
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: "users",
+                width: 500,
+                crop: "scale",
+            });
 
-      profileImageUrl = result.secure_url;
+            profileImageUrl = result.secure_url;
 
-      // 🔥 delete temp file
-      fs.unlinkSync(req.file.path);
+            // 🔥 delete temp file
+            fs.unlinkSync(req.file.path);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                ...(name && { name }),
+                ...(bio && { bio }),
+                ...(profileImageUrl && { userImage: profileImageUrl }),
+            },
+            { new: true }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            data: updatedUser,
+        });
+    } catch (error) {
+        console.error("Update profile error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update profile",
+        });
     }
-
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        ...(name && { name }),
-        ...(bio && { bio }),
-        ...(profileImageUrl && { userImage: profileImageUrl }),
-      },
-      { new: true }
-    );
-
-    return res.status(200).json({
-      success: true,
-      message: "Profile updated successfully",
-      data: updatedUser,
-    });
-  } catch (error) {
-    console.error("Update profile error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to update profile",
-    });
-  }
 };
 
 export const getUser = async (req, res) => {

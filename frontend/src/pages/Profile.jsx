@@ -146,7 +146,7 @@ const Profile = () => {
 
         try {
             const res = await axios.put(
-                "https://vishnu-gym-backend-server.onrender.com/api/update-profile",
+                "http://localhost:5000/api/update-profile",
                 formData,
                 { withCredentials: true }
             );
@@ -235,10 +235,10 @@ const Profile = () => {
                                                 Cancel
                                             </Button>
                                             <Button type="submit" className="bg-green-600">
-                                                {isLoading?
-                                                <span className='flex gap-2 items-center'> 
-                                                    <Loader/> Loading....
-                                                </span> :<span>Save changes</span>}
+                                                {isLoading ?
+                                                    <span className='flex gap-2 items-center'>
+                                                        <Loader /> Loading....
+                                                    </span> : <span>Save changes</span>}
                                             </Button>
                                         </DialogFooter>
                                     </form>

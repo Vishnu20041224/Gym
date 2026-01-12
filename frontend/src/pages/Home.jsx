@@ -138,8 +138,11 @@ const Home = () => {
     try {
       setSubmitMsgLoading(true)
       const res = await axios.post(
-        "https://vishnu-gym-backend-server.onrender.com/api/getintouch",
-        form
+        "http://localhost:5000/api/getintouch",
+        form,
+        {
+          withCredentials: true,
+        }
       );
       setSubmitMsgLoading(false)
       successfullyToast("Mail", res.data.message || "Message sent successfully");
@@ -177,7 +180,7 @@ const Home = () => {
 
       // 🔐 check auth via backend
       await axios.get(
-        "https://vishnu-gym-backend-server.onrender.com/checktoken",
+        "http://localhost:5000/checktoken",
         { withCredentials: true }
       );
 
@@ -258,7 +261,7 @@ const Home = () => {
 
     try {
       const res = await axios.post(
-        "https://vishnu-gym-backend-server.onrender.com/api/payment/verify-payment",
+        "http://localhost:5000/api/payment/verify-payment",
         formData,
         {
           withCredentials: true, // ✅ send cookies if needed

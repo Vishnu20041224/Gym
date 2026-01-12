@@ -6,10 +6,10 @@ const Contact = () => {
 
   // Send Us a Message
 
-   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
-  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
 
   const [sendMsg, setSendMsg] = useState({
     firstName: "", lastName: "", email: "", phoneNo: "", msg: ""
@@ -28,7 +28,7 @@ const Contact = () => {
 
       // Simulate API call
 
-      await axios.post("https://vishnu-gym-backend-server.onrender.com/api/contact",sendMsg)
+      await axios.post("http://localhost:5000/api/contact", sendMsg)
       successfullyToast("Mail", "Message sent successfully");
 
 
