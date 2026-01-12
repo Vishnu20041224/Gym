@@ -30,7 +30,7 @@ app.use(cookieParser());
 // Middleware
 
 app.use(cors({
-  origin: ["http://localhost:5173"],
+  origin: ["http://localhost:5173", "https://vishnu-gym.vercel.app", "https://vishnu-gym.onrender.com"],
   credentials: true
 }));
 
