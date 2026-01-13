@@ -1,13 +1,13 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "https://vishnu-gym-backend-server.onrender.com/api",
+    baseURL: "http://localhost:5000/api",
     headers: {
         "Content-Type": "application/json",
     },
     withCredentials: true
 });
-
+// https://vishnu-gym-backend-server.onrender.com
 // FETCH DATA
 
 //    TRAINERS

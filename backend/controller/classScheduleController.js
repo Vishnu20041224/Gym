@@ -1,4 +1,5 @@
 import ClassSchedule from "../model/classScheduleModel.js";
+import { sendClassScheduleEmailInternal } from "./contactController.js";
 
 export const getClassScheduleByType = async (req, res) => {
   try {
@@ -43,11 +44,15 @@ export const postSelectClassSchedule = async (req, res) => {
 
     // send Mail 
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: classSchedule,
       message: "Class schedule selected successfully",
     });
+
+    sendClassScheduleEmailInternal(req.user._id, id)
+
+
   } catch (error) {
     console.error("Error selecting class schedule:", error);
     res.status(500).json({
@@ -62,7 +67,7 @@ export const postSelectClassSchedule = async (req, res) => {
 export const getUserClassSchedule = async (req, res) => {
   try {
     console.log(req.user)
-    const userClassSchedule = await ClassSchedule.find({userId:req.user._id})
+    const userClassSchedule = await ClassSchedule.find({ userId: req.user._id })
 
     res.status(200).json({
       success: true,
@@ -137,8 +142,8 @@ export const getAllClassSchedule = async (req, res) => {
   try {
     let allClassScheduls = await ClassSchedule.find({})
     return res.status(200).json({
-      success:true,
-      data:allClassScheduls
+      success: true,
+      data: allClassScheduls
     })
   } catch (error) {
     console.error("Error fetching class schedule:", error);

@@ -43,7 +43,7 @@ const ClassSchedule = () => {
             setSubmitScheduleLoading(true)
             let res = await postSelectClassSchedule(selectSchedule._id);
 
-            await mailSelectClassSchedule(selectSchedule._id);
+            // await mailSelectClassSchedule(selectSchedule._id);
             setClassSchedule((prev) => prev.map((item) =>
                 item._id === selectSchedule._id
                     ? { ...item, userId: res.data.userId, available: false }
