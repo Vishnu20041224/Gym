@@ -29,7 +29,7 @@ const Contact = () => {
       // Simulate API call
 
       let res = await postContactMail(sendMsg)
-      if (!res.success) return warningToast("Mail", "Failed to send message");
+      if (!res.data.success) return warningToast("Mail", "Failed to send message");
 
       successfullyToast("Mail", "Message sent successfully");
 
