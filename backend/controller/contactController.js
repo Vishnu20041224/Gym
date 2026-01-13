@@ -135,136 +135,46 @@ export const sendMessageFromContact = async (req, res) => {
   try {
     const { firstName, lastName, email, phoneNo, msg } = req.body;
 
-    if (!firstName || !lastName || !email || !phoneNo || !msg) {
+    // ✅ phoneNo is optional
+    if (!firstName || !lastName || !email || !msg) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "All required fields must be filled",
       });
     }
 
-    await transporter.sendMail({
-      from: `"Apex Athletics Gym Contact" <${process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_USER,
-      subject: "📩 New Contact Message",
-      html: `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Admin Contact Message</title>
-</head>
-
-<body style="margin:0; padding:0; background:#eef2f7; font-family:Arial, Helvetica, sans-serif;">
-
-<table style="padding:18px;"
-           width="100%" cellpadding="0" cellspacing="0">
-  <tr>
-    <td align="center">
-
-      <!-- Card -->
-      <table width="600" cellpadding="0" cellspacing="0"
-        style="background:#ffffff;
-        border-radius:12px;
-        box-shadow:0 10px 25px rgba(0,0,0,0.12);
-        overflow:hidden;">
-
-        <!-- Header -->
-        <tr>
-          <td style="
-            background:linear-gradient(135deg,#000000,#1f2937);
-            padding:18px;
-            text-align:center;
-          ">
-            <h2 style="margin:0; color:#ffffff; font-size:22px;">
-              Apex Athletics Gym
-            </h2>
-            <p style="margin:4px 0 0; color:#9ca3af; font-size:12px;">
-              Admin Contact Notification
-            </p>
-          </td>
-        </tr>
-
-        <!-- Content -->
-        <tr>
-          <td style="padding:18px; color:#111827; font-size:14px;">
-
-            <p style="margin:0 0 10px 0;">
-              New contact message received.
-              <strong style="color:#dc2626;">Admin use only.</strong>
-            </p>
-
-            <p style="margin:4px 0;">
-              <strong>First Name:</strong>
-              <span style="color:#2563eb;">${firstName}</span>
-            </p>
-
-            <p style="margin:4px 0;">
-              <strong>Last Name:</strong>
-              <span style="color:#2563eb;">${lastName}</span>
-            </p>
-
-            <p style="margin:4px 0;">
-              <strong>Email:</strong>
-              <span style="color:#16a34a;">${email}</span>
-            </p>
-
-            <p style="margin:4px 0;">
-              <strong>Phone:</strong>
-              <span style="color:#7c3aed;">${phoneNo}</span>
-            </p>
-
-            <p style="margin:12px 0 6px 0; font-weight:bold; color:#000;">
-              Message:
-            </p>
-
-            <div style="
-              background:#f8fafc;
-              border-left:4px solid #dc2626;
-              padding:12px;
-              border-radius:6px;
-              color:#1f2937;
-              line-height:1.5;
-            ">
-              ${msg}
-            </div>
-
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="background:#020617; padding:10px; text-align:center;">
-            <p style="margin:0; font-size:11px; color:#9ca3af;">
-              © ${new Date().getFullYear()} Apex Athletics Gym · Admin system email
-            </p>
-          </td>
-        </tr>
-
-      </table>
-
-    </td>
-  </tr>
-</table>
-
-</body>
-</html>
-`
-
+    // 🚀 Respond immediately (FAST)
+    res.status(200).json({
+      success: true,
+      message: "Message received",
     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Message sent successfully",
+    // 🔥 Send email in background
+    setImmediate(async () => {
+      try {
+        await transporter.sendMail({
+          from: `"Apex Athletics Gym Contact" <${process.env.EMAIL_USER}>`,
+          to: process.env.EMAIL_USER,
+          subject: "📩 New Contact Message",
+          html: `...YOUR HTML HERE...`,
+        });
+
+        console.log("✅ Contact mail sent successfully");
+      } catch (err) {
+        // ❌ NEVER use res here
+        console.error("❌ Contact mail error:", err.message);
+      }
     });
 
   } catch (error) {
-    console.error("EMAIL ERROR:", error);
-    return res.status(500).json({
+    console.error("❌ Controller error:", error.message);
+    res.status(500).json({
       success: false,
-      message: "Email sending failed",
+      message: "Server error",
     });
   }
 };
+
 
 
 

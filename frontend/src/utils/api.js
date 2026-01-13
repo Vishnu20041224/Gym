@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: "https://vishnu-gym-backend-server.onrender.com/api",
+    baseURL: `${import.meta.env.VITE_API_BASE_URL}`,
     headers: {
         "Content-Type": "application/json",
     },
