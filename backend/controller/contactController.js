@@ -1,4 +1,4 @@
-import emailApi from "../lib/sendMail.js";
+import emailApi from "../lib/mailSend.js";
 import classScheduleModel from "../model/classScheduleModel.js";
 import { User } from "../model/userModel.js";
 import transporter from "../lib/sendMail.js";
@@ -287,14 +287,14 @@ export const sendVerificationEmail = async (req, res) => {
     console.log("OTP:", otp);
 
     // Send email
-    //     await emailApi.sendTransacEmail({
-    //       sender: {
-    //         email: process.env.SENDER_EMAIL,
-    //         name: "Apex Athletics Gym",
-    //       },
-    //       to: [{ email }],
-    //       subject: "🔒 Your Verification Code",
-    //       htmlContent: `
+    // await emailApi.sendTransacEmail({
+    //   sender: {
+    //     email: process.env.SENDER_EMAIL,
+    //     name: "Apex Athletics Gym",
+    //   },
+    //   to: [{ email }],
+    //   subject: "🔒 Your Verification Code from emailApi",
+    //   htmlContent: `
     // <!DOCTYPE html>
     // <html>
     // <head>
@@ -348,9 +348,8 @@ export const sendVerificationEmail = async (req, res) => {
     // </html>
     //       `,
 
-    //     })
+    // })
 
-    console.log("Sending email to:", email);
     const info = await transporter.sendMail({
       from: `"Apex Athletics Gym" <${process.env.EMAIL_USER}>`,
       to: email,
@@ -426,6 +425,7 @@ export const sendVerificationEmail = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Email sending failed",
+      error,
     });
   }
 };
