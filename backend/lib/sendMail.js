@@ -18,13 +18,5 @@ transporter.verify((err, success) => {
   else console.log("SMTP READY ✅");
 });
 
-let info = await transporter.sendMail({
-  from: '"Test" <test@example.com>',
-  to: "rhvishnushankar@gmail.com",
-  subject: `Hello i am vishnu`,
-  text: "Test email"
-});
-
-console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
 
 export default transporter;

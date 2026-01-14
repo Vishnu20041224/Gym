@@ -287,7 +287,7 @@ export const sendVerificationEmail = async (req, res) => {
     console.log("OTP:", otp);
 
     // Send email
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"Apex Athletics Gym" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "🔒 Your Verification Code",
@@ -345,12 +345,12 @@ export const sendVerificationEmail = async (req, res) => {
 </html>
       `,
     });
-    console.log("Email sent ✅");
+
+    console.log("EMAIL SENT:", info.messageId);
 
     return res.status(200).json({
       success: true,
       message: "Verification code sent successfully",
-      otp, // optionally return for testing, in production save in DB or session
     });
 
   } catch (error) {
