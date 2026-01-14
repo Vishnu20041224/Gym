@@ -768,7 +768,10 @@ export const sendClassScheduleEmailInternal = async (userId, scheduleTimeId) => 
       return;
     }
 
-    await transporter.verify();
+    transporter.verify((error, success) => {
+      if (error) console.error("SMTP ERROR:", error);
+      else console.log("SMTP READY");
+    });
 
     // 2️⃣ Get schedule
     const scheduleTime = await classScheduleModel.findById(scheduleTimeId);
