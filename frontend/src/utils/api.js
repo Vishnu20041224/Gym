@@ -10,6 +10,8 @@ const API = axios.create({
 // https://vishnu-gym-backend-server.onrender.com
 // FETCH DATA
 
+console.log(import.meta.env.VITE_API_BASE_URL);
+
 //    TRAINERS
 
 export const getTrainers = async () => {

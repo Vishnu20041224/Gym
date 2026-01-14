@@ -66,12 +66,8 @@ const Home = () => {
   // fetch data from DB
   async function getData() {
     try {
-      // admin
 
-      // let res = await checkAuthenticatedUser()
-      // console.log(res.data.user.isAdmin)
-      // if(res.data.user.isAdmin) return navigate("/admin")
-
+      console.log("fetching data");
       const [
         trainersRes,
         scheduleRes,
@@ -88,11 +84,14 @@ const Home = () => {
       setSchedule(scheduleRes.data.data);
       setMembershipPlans(membershipRes.data.data);
       setTestimonials(testimonialsRes.data.data);
+      console.log("data fetched");
+
 
 
 
     } catch (error) {
       warningToast("Error", "Failed to fetch data");
+      console.log("error fetching data", error);
     }
   }
 

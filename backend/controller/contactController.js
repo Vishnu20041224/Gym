@@ -757,6 +757,9 @@ export const sendMessageAllUsers = async (req, res) => {
 };
 
 export const sendClassScheduleEmailInternal = async (userId, scheduleTimeId) => {
+  console.log("email sending");
+  console.log("userId", userId);
+  console.log("scheduleTimeId", scheduleTimeId);
   try {
     // 1️⃣ Get user
     const user = await User.findById(userId);
@@ -764,6 +767,8 @@ export const sendClassScheduleEmailInternal = async (userId, scheduleTimeId) => 
       console.error("Email error: User not found");
       return;
     }
+
+    await transporter.verify();
 
     // 2️⃣ Get schedule
     const scheduleTime = await classScheduleModel.findById(scheduleTimeId);

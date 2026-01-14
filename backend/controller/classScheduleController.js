@@ -25,6 +25,7 @@ export const getClassScheduleByType = async (req, res) => {
 export const postSelectClassSchedule = async (req, res) => {
   try {
     const { id } = req.params; // destructure params
+    console.log("postSelectClassSchedule Start")
 
     // Find the class schedule by ID
     const classSchedule = await ClassSchedule.findById(id);
@@ -43,6 +44,7 @@ export const postSelectClassSchedule = async (req, res) => {
     await classSchedule.save(); // save the change
 
     // send Mail 
+    await sendClassScheduleEmailInternal(req.user._id, id)
 
     res.status(200).json({
       success: true,
@@ -50,7 +52,6 @@ export const postSelectClassSchedule = async (req, res) => {
       message: "Class schedule selected successfully",
     });
 
-    sendClassScheduleEmailInternal(req.user._id, id)
 
 
   } catch (error) {
