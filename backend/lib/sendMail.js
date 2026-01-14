@@ -17,8 +17,6 @@ transporter.verify((err, success) => {
   if (err) console.error("SMTP ERROR:", err);
   else console.log("SMTP READY ✅");
 });
-
-console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
-console.log(user`: ${process.env.EMAIL_USER}`)
-console.log(password`: ${process.env.EMAIL_PASS}`)
+console.log(`user : ${process.env.EMAIL_USER}`)
+console.log(`password : ${process.env.EMAIL_PASS}`)
 export default transporter;
