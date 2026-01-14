@@ -68,6 +68,7 @@ const Signup = () => {
       setOtpSent(true);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to send OTP");
+      console.log(err)
     } finally {
       setLoading(false);
     }
