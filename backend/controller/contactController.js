@@ -350,6 +350,7 @@ export const sendVerificationEmail = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      otp,
       message: "Verification code sent successfully",
     });
 
