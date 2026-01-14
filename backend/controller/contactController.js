@@ -275,7 +275,7 @@ const generateOTP = () => {
 export const sendVerificationEmail = async (req, res) => {
   try {
     const { email, name } = req.body;
-
+    console.log("REQ.BODY:", req.body);
     if (!email || !name) {
       return res.status(400).json({
         success: false,
@@ -284,6 +284,7 @@ export const sendVerificationEmail = async (req, res) => {
     }
 
     const otp = generateOTP();
+    console.log("OTP:", otp);
 
     // Send email
     await transporter.sendMail({
@@ -344,6 +345,7 @@ export const sendVerificationEmail = async (req, res) => {
 </html>
       `,
     });
+    console.log("Email sent ✅");
 
     return res.status(200).json({
       success: true,
