@@ -68,7 +68,7 @@ export const postSelectClassSchedule = async (req, res) => {
 export const getUserClassSchedule = async (req, res) => {
   try {
     console.log(req.user)
-    const userClassSchedule = await ClassSchedule.find({ userId: req.user._id })
+    const userClassSchedule = await ClassSchedule.find({ userId: req.user._id }).sort({ createdAt: -1 })
 
     res.status(200).json({
       success: true,
