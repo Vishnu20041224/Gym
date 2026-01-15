@@ -8,9 +8,11 @@ import { Link } from 'react-router-dom';
 const HeroPage = () => {
 
   const [userName, setUserName] = useState(null)
+  const [isProfileUpdated, setIsProfileUpdated] = useState(false);
 
   const getUser = async () => {
     try {
+      setIsProfileUpdated(true)
       const res = await checkAuthenticatedUser()
       if (res.data.success) {
         setUserName(res.data.user.name)
@@ -18,6 +20,9 @@ const HeroPage = () => {
     } catch (error) {
       setUserName(null)
       console.log("User not logged in");
+    }
+    finally {
+      setIsProfileUpdated(false);
     }
   }
 
@@ -43,7 +48,7 @@ const HeroPage = () => {
       <div className='top-0 left-0 absolute bg-black/60 h-full w-full'></div>
       <div className='top-1/2 left-1/2 absolute -translate-x-1/2 -translate-y-1/2 text-center w-full'>
         <TextEffect per='char' preset='fade' className='text-3xl md:text-4xl lg:text-7xl font-semibold px-3 md:px-6 lg:px-20 block'>Unleash Your Potential. Transform Your Body.</TextEffect >
-        {!userName && <Link
+        {!userName && !isProfileUpdated && <Link
           to={"/login"}
           className={`btn-primary text-black px-4 py-1.5 rounded-lg mt-6 inline-block font-semibold`}
         >

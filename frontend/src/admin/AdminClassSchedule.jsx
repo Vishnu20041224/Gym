@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { getAllClassSchedule } from "../utils/api";
+import { Loader } from "lucide-react";
 
 const AdminClassSchedule = () => {
   const [classes, setClasses] = useState([]);
   const [times, setTimes] = useState([]);
   const [schedule, setSchedule] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   async function fetchData() {
+    setIsLoading(true)
     const res = await getAllClassSchedule();
     const data = res.data.data;
 
@@ -34,6 +37,7 @@ const AdminClassSchedule = () => {
     });
 
     setSchedule(structuredSchedule);
+    setIsLoading(false)
   }
 
   useEffect(() => {
@@ -73,11 +77,10 @@ const AdminClassSchedule = () => {
                     <td key={cls} className="p-2 text-center">
                       {cell ? (
                         <div
-                          className={`rounded-md px-3 py-2 text-sm ${
-                            cell.available
+                          className={`rounded-md px-3 py-2 text-sm ${cell.available
                               ? ""
                               : "bg-gray-800"
-                          }`}
+                            }`}
                         >
                           <div className="font-medium">
                             {cell.available ? "Available" : "Booked"}
@@ -100,7 +103,14 @@ const AdminClassSchedule = () => {
         </table>
       </div>
 
-      
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="flex items-center gap-2">
+            <Loader className="animate-spin text-white" size={24} />
+            <span className="text-white">Loading...</span>
+          </div>
+        </div>
+      )}
 
     </div>
   );

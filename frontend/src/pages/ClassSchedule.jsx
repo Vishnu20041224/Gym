@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { getClassSchedule, mailSelectClassSchedule, postSelectClassSchedule } from '../utils/api';
 import { successfullyToast, warningToast } from '../lib/toast';
+import { Skeleton } from "@/components/ui/skeleton"
 const ClassSchedule = () => {
 
 
@@ -10,12 +11,15 @@ const ClassSchedule = () => {
 
     // loading 
     let [submitScheduleLoading, setSubmitScheduleLoading] = useState(false);
+    const placeholderArray = Array.from({ length: 16 });
+    const [loading, setLoading] = useState(true);
 
     const { classType } = useParams();
 
     async function fetchData() {
         try {
             console.log(classType);
+            setLoading(true)
 
             const res = await getClassSchedule(classType);
             console.log(res.data);
@@ -24,6 +28,9 @@ const ClassSchedule = () => {
         } catch (error) {
             console.error("Error fetching class schedule:", error);
             warningToast("Class schedule", error.response?.data?.message || "Please try again later.");
+        }
+        finally {
+            setLoading(false)
         }
     }
     console.log(classType);
@@ -81,13 +88,25 @@ const ClassSchedule = () => {
                     <p className='font-normal text-xs md:text-lg lg:text-xl/6 pb-4 capitalize'>Book your 1-hour slots. Available hours are in green, unavailable/blocked hours are in gray.</p>
                 </div>
 
-                <div className='grid grid-cols-4 gap-3 max-w-4xl w-full mx-auto'>
+                {!loading ? <div className='grid grid-cols-4 gap-3 max-w-4xl w-full mx-auto'>
                     {classSchedule.map((schedule, index) => (
-                        <div onClick={() => setSelectSchedule(schedule)} key={index} className={`py-3 px-2 rounded-lg text-center font-semibold ${selectSchedule === schedule ? 'bg-green-500 text-white' : ''} ${schedule.available ? 'bg-gray-400 text-gray-600 hover:bg-green-400 cursor-pointer' : 'bg-red-800 text-white hover:bg-red-700 cursor-not-allowed '}`}>
+                        <div onClick={() => setSelectSchedule(schedule)} key={index} className={`py-3 px-2 rounded-lg text-center font-semibold ${selectSchedule === schedule ? 'bg-green-800 text-white' : ''} ${schedule.available ? 'bg-gray-400 text-gray-600 hover:bg-green-400 cursor-pointer' : 'bg-red-800 text-white hover:bg-red-700 cursor-not-allowed '}`}>
                             <button disabled={!schedule.available}>{schedule.time}</button>
                         </div>
                     ))}
                 </div>
+                    :
+                    <div className="grid grid-cols-4 gap-3 max-w-4xl w-full mx-auto">
+                        {placeholderArray.map((_, index) => (
+                            <div
+                                key={index}
+                                className="py-3 px-2 rounded-lg text-center font-semibold cursor-not-allowed bg-gray-800"
+                            >
+                                <Skeleton className="h-8 w-full rounded-md" />
+                            </div>
+                        ))}
+                    </div>}
+
                 <div className='flex justify-center items-center max-w-6xl w-full mt-6'>
                     <button onClick={submitSchedule} disabled={submitScheduleLoading} className='px-4 py-2 bg-[#FA8C38] text-black font-medium rounded-lg cursor-pointer'>{submitScheduleLoading ? "Loading..." : "Select Time"}</button>
                 </div>

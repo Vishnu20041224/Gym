@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Check } from 'lucide-react';
+import { Check, Loader } from 'lucide-react';
 import { useEffect } from 'react'
 import { checkAuthenticatedUser, getCoachs } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -119,6 +119,15 @@ const Trainers = () => {
           </div>
         </div>
       </div>
+
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="flex items-center gap-2">
+            <Loader className="animate-spin text-white" size={24} />
+            <span className="text-white">Loading...</span>
+          </div>
+        </div>
+      )}
 
     </div>
   )

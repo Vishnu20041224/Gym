@@ -27,6 +27,7 @@ const Profile = () => {
 
     const [openEdit, setOpenEdit] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
 
     let [classSchedule, setClassSchedule] = useState([])
@@ -54,6 +55,7 @@ const Profile = () => {
     async function fetchData() {
 
         try {
+            setIsUpdating(true)
             const user = await checkAuthenticatedUser()
             if (user.data.success) {
                 setUserName(user.data.user.name)
@@ -82,6 +84,9 @@ const Profile = () => {
             }
         } catch (error) {
             warningToast("User Data", error.message)
+        }
+        finally {
+            setIsUpdating(false)
         }
     }
 
@@ -249,9 +254,12 @@ const Profile = () => {
 
             </div>}
 
-            {isLoading && (
+            {isUpdating && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <Loader className="animate-spin text-white" size={40} />
+                    <div className="flex items-center gap-2">
+                        <Loader className="animate-spin text-white" size={24} />
+                        <span className="text-white">Loading...</span>
+                    </div>
                 </div>
             )}
 

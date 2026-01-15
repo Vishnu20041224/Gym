@@ -7,10 +7,12 @@ const Nav = () => {
   const [open, setOpen] = useState(false)
   const [userName, setUserName] = useState(null)
   const [userData, setUserData] = useState(null)
+  const [isProfileUpdated, setIsProfileUpdated] = useState(false);
 
 
   const getUser = async () => {
     try {
+      setIsProfileUpdated(true)
       const res = await checkAuthenticatedUser()
       if (res.data.success) {
         setUserName(res.data.user.name)
@@ -19,6 +21,9 @@ const Nav = () => {
       }
     } catch (error) {
       console.log("User not logged in");
+    }
+    finally {
+      setIsProfileUpdated(false);
     }
   }
 
@@ -64,7 +69,7 @@ const Nav = () => {
           </div>
 
           {/* Desktop Button */}
-          <div
+          {!isProfileUpdated ? <div
             className={`btn-primar text-base font-semibold px-3.5 py-1 rounded-lg max-md:hidden`}
           >
             {userName ?
@@ -85,7 +90,14 @@ const Nav = () => {
               </NavLink> :
               <NavLink to={"/login"} className={"btn-primary text-black px-4 py-1.5 rounded-lg inline-block font-semibold"}>Join Now</NavLink>}
 
-          </div>
+          </div> :
+            <div className="btn-primary text-base font-semibold px-3.5 py-1 rounded-lg max-md:hidden">
+              <div className="flex gap-2 items-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <span>Loading...</span>
+              </div>
+            </div>
+          }
 
           {/* Mobile Icon */}
           <MenuIcon className="md:hidden cursor-pointer" onClick={() => setOpen(true)} />
@@ -120,7 +132,7 @@ const Nav = () => {
                         size={80}
                       />
                     )}
-                     <h1>Profile</h1>
+                    <h1>Profile</h1>
                   </NavLink> :
                   <NavLink to={"/profile"}>Join Now</NavLink>}
               </div>
