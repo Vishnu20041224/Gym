@@ -9,7 +9,7 @@ const ClassSchedule = () => {
     const [classSchedule, setClassSchedule] = useState([])
     let [selectSchedule, setSelectSchedule] = useState(null);
 
-    // loading 
+    // loading this data
     let [submitScheduleLoading, setSubmitScheduleLoading] = useState(false);
     const placeholderArray = Array.from({ length: 16 });
     const [loading, setLoading] = useState(true);
